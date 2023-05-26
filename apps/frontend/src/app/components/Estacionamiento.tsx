@@ -5,9 +5,9 @@ import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
 import { useEffect, useState } from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { AppPDF } from './AppPDF';
+import { AppPDF } from '../AppPDF';
 
-export const App = () => {
+export const Estacionamiento = () => {
   const [showModalInfo, setShowModalInfo] = useState<boolean>(false);
   const [showModalAdd, setShowModalAdd] = useState<boolean>(false);
   const [showModalConfirmDelete, setShowModalConfirmDelete] =
@@ -15,10 +15,10 @@ export const App = () => {
   const [editarModal, setEditarModal] = useState<boolean>(true);
   const [placa, setPlaca] = useState('');
   const [residente, setResidente] = useState<string>('Oficial');
-  const [entrada, setEntrada] = useState<number>(0);
   const [datos, setDatos] = useState([]);
   const [vehiculo, setVehiculo] = useState<any>([]);
-  const [value, onChange] = useState<any>(new Date());
+  const [valueEntrada, onChangeEntrada] = useState<any>(new Date());
+  const [valueSalida, onChangeSalida] = useState<any>(new Date());
   const [precio, setPrecio] = useState(0);
 
   useEffect(() => {
@@ -50,8 +50,8 @@ export const App = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const datos = { placa, residente, entrada: Date.now() };
-    setEntrada(Date.now());
+    const datos = { placa, residente };
+
     try {
       await axios
         .post('http://localhost:3333/api/datos', datos)
@@ -73,7 +73,8 @@ export const App = () => {
 
   const handleSave = async (id: string) => {
     const datosAxios = {
-      salida: value,
+      entrada: valueEntrada,
+      salida: valueSalida,
       cobro: precio,
     };
     try {
@@ -102,11 +103,11 @@ export const App = () => {
   }, [vehiculo]);
 
   useEffect(() => {
-    const entradaNumero = new Date(entrada).getTime();
-    const salidaNumero = new Date(value).getTime();
+    const entradaNumero = new Date(valueEntrada).getTime();
+    const salidaNumero = new Date(valueSalida).getTime();
     const resultado = salidaNumero - entradaNumero;
 
-    if (value) {
+    if (valueEntrada && valueSalida) {
       if (vehiculo.residente === 'No residente') {
         const division = Math.round(resultado / 60000);
         setPrecio(division * 3);
@@ -130,8 +131,20 @@ export const App = () => {
     setVehiculo(a);
     setShowModalInfo(!showModalInfo);
   };
+
+  const cambioDeMinutosAHora = (totalMinutos: number) => {
+    const minutos = totalMinutos % 60;
+    const horas = Math.floor(totalMinutos / 60);
+
+    return `${separar(horas)}:${separar(minutos)}`;
+  };
+
+  const separar = (num: number) => {
+    return num.toString().padStart(2, '0');
+  };
+
   return (
-    <div>
+    <div className="h-full w-full">
       {datos ? (
         <>
           <div className="flex mt-4 justify-end px-4">
@@ -143,45 +156,66 @@ export const App = () => {
             </button>
           </div>
 
-          <div className="h-full w-full flex items-center justify-center bg-teal-lightest font-sans">
-            <div className="bg-white rounded shadow p-6 m-4 w-full lg:max-w-4xl">
-              <div className="mb-4 text-center">
-                <h1 className="text-grey-darkest text-4xl">
+          <div className=" flex items-center justify-center bg-teal-lightest font-sans">
+            <div className="bg-white rounded shadow p-6 w-full lg:max-w-4xl">
+              <div className="mb-4 ">
+                <h1 className="text-grey-darkest text-4xl text-center">
                   Estacionamiento Garza Limon
                 </h1>
               </div>
               <div>
-                <div className="flex mb-4 justify-between">
+                <div className="flex mb-4 justify-between text-2xl">
                   <p>Placa</p>
                   <p>Tipo de vehiculo</p>
-                  <p>Entrada</p>
-                  <p>Salida</p>
+                  <p>Tiempo en estacionamiento</p>
                   <p>Cobro</p>
                 </div>
 
                 {datos.map((vehiculo: any, i) => (
                   <div id={vehiculo._id} key={i}>
-                    <div className="flex mb-4 justify-between max-w-full">
-                      <button
-                        className="bg-pink-500 text-white w-[130px] active:bg-pink-600 font-bold uppercase text-xs px-4 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mb-1 ease-linear transition-all duration-150"
-                        type="button"
-                        onClick={() => mostrarDatos(vehiculo)}
-                      >
-                        {vehiculo.placa}
-                      </button>
-                      <p className="w-[70px]">{vehiculo.residente}</p>
-                      <p className="w-[5px] mx-28">
-                        {new Date(vehiculo.entrada).toLocaleString()}
-                      </p>
-                      {vehiculo.salida ? (
-                        <p>{new Date(vehiculo.salida).toLocaleString()}</p>
+                    <div className="flex mb-4 justify-between ">
+                      <div>
+                        <button
+                          className=" bg-pink-500 text-white w-[80px] active:bg-pink-600 font-bold uppercase text-md p-2 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
+                          type="button"
+                          onClick={() => mostrarDatos(vehiculo)}
+                        >
+                          {vehiculo.placa}
+                        </button>
+                      </div>
+                      <div className="flex w-[150px]">
+                        <p>{vehiculo.residente}</p>
+                      </div>
+
+                      {vehiculo.residente === 'No residente' ||
+                      vehiculo.residente === 'Oficial' ? (
+                        <div className="flex justify-between w-[150px]">
+                          <p>
+                            {vehiculo.cobro.slice(-1) >= 60
+                              ? cambioDeMinutosAHora(
+                                  vehiculo.cobro.slice(-1) / 3
+                                ) + ' Horas'
+                              : vehiculo.cobro.slice(-1) / 3 + ' minutos'}
+                          </p>
+                        </div>
                       ) : (
-                        <p className="w-[100px]">No hay salida</p>
+                        <div className="flex justify-between w-[150px]">
+                          <p>
+                            {vehiculo.cobro.slice(-1) >= 60
+                              ? cambioDeMinutosAHora(vehiculo.cobro.slice(-1)) +
+                                ' Horas'
+                              : vehiculo.cobro.slice(-1) + ' minutos'}
+                          </p>
+                        </div>
                       )}
                       {vehiculo.residente === 'Oficial' ? (
-                        <p className="ml-12">No hay cobro</p>
+                        <div className="">
+                          <p>No hay cobro</p>
+                        </div>
                       ) : (
-                        <p className="ml-12">${vehiculo.cobro}</p>
+                        <div className="">
+                          <p>${vehiculo.cobro.slice(-1)}</p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -194,8 +228,14 @@ export const App = () => {
               document={<AppPDF data={datos} />}
               fileName={'estacionamiento'}
             >
-              {({ blob, url, loading, error }) =>
-                loading ? 'Cargando...' : 'Descargar Pdf'
+              {({ loading }) =>
+                loading ? (
+                  'Cargando...'
+                ) : (
+                  <button className="bg-pink-500 text-white active:bg-pink-600 font-bold uppercase text-lg p-2 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
+                    Descargar Pdf
+                  </button>
+                )
               }
             </PDFDownloadLink>
           </div>
@@ -230,14 +270,26 @@ export const App = () => {
                           <p className="my-4 text-slate-500 text-lg leading-relaxed">
                             Placa: {vehiculo.placa}
                           </p>
-                          <label className="block mt-3 mb-1 text-sm font-medium text-gray-900 dark:text-gray-400">
-                            Escoge la hora de salida
-                          </label>
-                          <DateTimePicker
-                            onChange={onChange}
-                            value={value}
-                            disabled={editarModal}
-                          />
+                          <div className="flex justify-around">
+                            <label className="block mt-3 mb-1 text-sm font-medium text-gray-900 dark:text-gray-400">
+                              Escoge la hora de entrada
+                            </label>
+                            <label className="block mt-3 mb-1 text-sm font-medium text-gray-900 dark:text-gray-400">
+                              Escoge la hora de salida
+                            </label>
+                          </div>
+                          <div className="flex justify-around">
+                            <DateTimePicker
+                              onChange={onChangeEntrada}
+                              value={valueEntrada}
+                              disabled={editarModal}
+                            />
+                            <DateTimePicker
+                              onChange={onChangeSalida}
+                              value={valueSalida}
+                              disabled={editarModal}
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -398,4 +450,4 @@ export const App = () => {
   );
 };
 
-export default App;
+export default Estacionamiento;

@@ -3,6 +3,7 @@ import bodyParser = require('body-parser');
 import dotenv = require('dotenv');
 import mongoose = require('mongoose');
 import cors = require('cors');
+import { type } from 'os';
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,7 @@ const VehiculoSchema = new mongoose.Schema({
     required: true,
     minLength: 1,
     maxLength: 120,
+    unique: true,
   },
   residente: {
     type: String,
@@ -23,17 +25,16 @@ const VehiculoSchema = new mongoose.Schema({
     enum: ['Oficial', 'Residente', 'No residente'],
     default: 'Oficial',
   },
-  entrada: {
-    type: Date,
-  },
-  salida: {
-    type: Date,
-  },
-  cobro: {
-    type: Number,
-    default: 0,
-  },
+  entrada: [{ type: Date }],
+  salida: [{ type: Date }],
+  cobro: [
+    {
+      type: Number,
+      default: 0,
+    },
+  ],
 });
+
 const Vehiculo = mongoose.model('Vehiculo', VehiculoSchema);
 const jsonParser = bodyParser.json();
 
@@ -56,13 +57,12 @@ app.get('/api/datos', function (req, res) {
 });
 // POST ingresa vehiculos por json
 app.post('/api/datos', jsonParser, async function (req, res) {
-  const { placa, residente, entrada } = req.body;
+  const { placa, residente } = req.body;
+
   const item = new Vehiculo({
     placa,
     residente,
-    entrada,
   });
-
   try {
     await item.save();
     res.statusMessage = 'Se ingreso al usuario correctamente';
@@ -89,16 +89,19 @@ app.delete('/api/datos/:id', (req, res) => {
 });
 //PATCH update por id
 app.patch('/api/datos/:id', jsonParser, async function (req, res) {
-  const { salida, cobro } = req.body;
+  const { entrada, salida, cobro } = req.body;
   try {
     Vehiculo.findByIdAndUpdate(req.params.id)
       .then((todo) => {
         if (!todo) {
           return res.status(404).send();
         }
-        todo.salida = salida;
-        todo.cobro = cobro;
+
+        todo.entrada.push(entrada);
+        todo.salida.push(salida);
+        todo.cobro.push(cobro);
         todo.save();
+        console.log(todo);
         res.statusMessage = 'Se actualizo correctamente';
         res.status(200).send(todo);
       })
