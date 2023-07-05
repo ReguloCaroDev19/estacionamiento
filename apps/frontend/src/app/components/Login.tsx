@@ -22,7 +22,7 @@ export const Login = () => {
     }
   };
   return (
-    <div className="absolute bg-yellow-900 top-1/4 left-1/3 rounded-lg">
+    <div className=" bg-yellow-900 justify-center items-center m-20  rounded-lg">
       <div className="flex justify-center items-center text-white py-24 px-4 text-6xl">
         Bienvenido de vuelta
       </div>
@@ -35,7 +35,7 @@ export const Login = () => {
       </div>
       <div className="flex justify-center items-center py-5 p-2 text-3xl rounded-lg">
         <input
-          type="text"
+          type="password"
           placeholder="Contraseña"
           onChange={(e) => settingPassword(e)}
         ></input>

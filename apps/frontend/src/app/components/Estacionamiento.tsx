@@ -156,7 +156,7 @@ export const Estacionamiento = () => {
             </button>
           </div>
 
-          <div className=" flex items-center justify-center bg-teal-lightest font-sans">
+          <div className=" flex items-center justify-center bg-teal-lightest font-sans py-10">
             <div className="bg-white rounded shadow p-6 w-full lg:max-w-4xl">
               <div className="mb-4 ">
                 <h1 className="text-grey-darkest text-4xl text-center">
@@ -173,10 +173,10 @@ export const Estacionamiento = () => {
 
                 {datos.map((vehiculo: any, i) => (
                   <div id={vehiculo._id} key={i}>
-                    <div className="flex mb-4 justify-between ">
+                    <div className="flex mb-4 justify-between">
                       <div>
                         <button
-                          className=" bg-pink-500 text-white w-[80px] active:bg-pink-600 font-bold uppercase text-md p-2 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
+                          className=" bg-pink-500 text-white active:bg-pink-600 font-bold uppercase text-md p-2 rounded truncate"
                           type="button"
                           onClick={() => mostrarDatos(vehiculo)}
                         >
