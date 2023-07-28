@@ -1,5 +1,5 @@
 {
-  "name": "estacionamiento",
+  "name": "enroute-test",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -27,6 +27,8 @@
     "react-dom": "18.2.0",
     "react-router-dom": "^6.11.2",
     "regenerator-runtime": "0.13.7",
+    "sweetalert2": "^11.7.20",
+    "sweetalert2-react-content": "^5.0.7",
     "tslib": "^2.3.0",
     "yup": "^0.32.11"
   },
