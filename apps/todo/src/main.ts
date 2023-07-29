@@ -23,19 +23,17 @@ app.get('/api/data', function (req, res) {
       const dataResponseMultipliers = [];
       const dataResponseTolerance = [];
       todo.forEach(function (toDo) {
-        dataResponseMultipliers.push(toDo);
+        dataResponseTolerance.push(toDo);
       });
       Multipliers.find({}, function (err, todo) {
         todo.forEach(function (toDo) {
-          dataResponseTolerance.push(toDo);
+          dataResponseMultipliers.push(toDo);
         });
-        res
-          .status(200)
-          .send({
-            success: true,
-            dataResponseMultipliers,
-            dataResponseTolerance,
-          });
+        res.status(200).send({
+          success: true,
+          dataResponseMultipliers,
+          dataResponseTolerance,
+        });
       });
     });
   } catch (error) {
