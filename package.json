@@ -6,8 +6,8 @@
     "start": "npx nx run-many --target=serve  --all --maxParallel=4",
     "build": "nx build",
     "test": "nx test",
-	"vercel-build-app1": "nx build frontend",
-    "vercel-build-app2": "nx build todo"
+	"vercel-build-frontend": "nx build frontend",
+    "vercel-build-todo": "nx build todo"
   },
   "private": true,
   "dependencies": {

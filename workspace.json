@@ -2,7 +2,31 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
-    "frontend": "apps/frontend",
-    "todo": "apps/todo"
-  }
+    "frontend": {
+      "root": "apps/frontend",
+      "sourceRoot": "apps/frontend/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/web:build",
+          "options": {
+            "outputPath": "dist/apps/frontend"
+          }
+        }
+      }
+    }
+  },
+  "todo": {
+      "root": "apps/todo",
+      "sourceRoot": "apps/todo/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/web:build",
+          "options": {
+            "outputPath": "dist/apps/todo"
+          }
+        }
+      }
+    }
 }
