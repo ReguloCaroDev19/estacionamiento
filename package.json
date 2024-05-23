@@ -5,7 +5,9 @@
   "scripts": {
     "start": "npx nx run-many --target=serve  --all --maxParallel=4",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+	"vercel-build-app1": "nx build frontend",
+    "vercel-build-app2": "nx build todo"
   },
   "private": true,
   "dependencies": {
